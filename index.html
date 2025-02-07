@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPrefab.ai - Company Newsletter</title>
+    <style>
+        /* Global Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header img {
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        /* Company Grid */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card h3 {
+            padding: 15px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background: #222;
+            color: white;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Logo -->
+    <div class="header">
+        <img src="assets/logo.png" alt="iPrefab.ai Logo">
+        iPrefab.ai - Company Newsletter
+    </div>
+
+    <!-- Company Cards -->
+    <div class="container" id="companyContainer">
+        <p>Loading companies...</p>
+    </div>
+    <!-- Modal for Company Details -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <style>
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal.show {
+            opacity: 1;
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #222;
+        }
+
+        .modal-content p {
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+
+        .modal-content a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .modal-content a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("https://script.google.com/macros/s/AKfycbxvcSlE48ky3JFc2uSV0XK5S-JzqdWqqap1Is6Gw732h2R1PG1IdqPMTEPzbG3KOdj-cQ/exec") 
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById("companyContainer");
+                    container.innerHTML = ""; // Clear previous content
+                    data.forEach(company => {
+                        // Use the imageName column to construct the correct image path
+                        let imageName = company.imageName ? company.imageName.trim() : "";
+                        let imagePath = imageName ? `images/${imageName}` : "images/placeholder.jpg";
+
+                        let card = document.createElement("div");
+                        card.classList.add("card");
+                        card.innerHTML = `
+                            <img src="${imagePath}" alt="${company['Company Name']}">
+                            <h3>${company['Company Name']}</h3>
+                        `;
+                        card.addEventListener("click", () => openModal(company));
+                        container.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error loading company data:", error);
+                    document.getElementById("companyContainer").innerHTML = "<p>Error loading data. Please try again.</p>";
+                });
+        });
+
+        function openModal(company) {
+            let modal = document.getElementById("modal");
+            let modalBody = document.getElementById("modal-body");
+
+            modalBody.innerHTML = `
+                <h2>${company['Company Name']}</h2>
+                <p><strong>Website:</strong> <a href="${company.Site}" target="_blank">${company.Site}</a></p>
+                <p><strong>Email:</strong> ${company['e-mail'] || "N/A"}</p>
+                <p><strong>Address:</strong> ${company.Address || "N/A"}</p>
+                <p><strong>Phone:</strong> ${company.Telephone || "N/A"}</p>
+                <p><strong>Sales Representative:</strong> ${company.Salesman || "N/A"}</p>
+                <p><strong>Material:</strong> ${company.Material || "N/A"}</p>
+                <p><strong>Country:</strong> ${company.Country || "N/A"}</p>
+                <p><strong>Description:</strong> ${company.Description || "No description available"}</p>
+                <p><strong>Available Since:</strong> ${company.Date || "N/A"}</p>
+                <p><strong>Price:</strong> ${company.Price || "N/A"}</p>
+                <br>
+                <button onclick="closeModal()" style="padding: 10px; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+            `;
+
+            modal.classList.add("show");
+        }
+
+        function closeModal() {
+            document.getElementById("modal").classList.remove("show");
+        }
+    </script>
+
+    <!-- Footer -->
+    <div class="footer">
+        Created by <strong>iPrefab.ai</strong> | © 2024 All Rights Reserved
+    </div>
+</body>
+</html>
